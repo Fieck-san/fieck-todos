@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Todo App</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #2196f3 0%, #4ecdc4 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .add-todo {
+        padding: 30px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .todo-input {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      .todo-input:focus {
+        border-color: #667eea;
+      }
+
+      .priority-select {
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        background: white;
+        cursor: pointer;
+      }
+
+      .add-btn {
+        padding: 15px 25px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+
+      .add-btn:hover {
+        background: #5a67d8;
+      }
+
+      .todo-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .todo-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 30px;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background 0.3s;
+      }
+
+      .todo-item:hover {
+        background: #f8f9fa;
+      }
+
+      .todo-item.completed {
+        background: #e8f5e8;
+      }
+
+      .todo-checkbox {
+        margin-right: 15px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+
+      .priority-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 15px;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      .priority-high {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+      }
+
+      .priority-medium {
+        background: #fff3e0;
+        color: #ef6c00;
+        border: 1px solid #ffcc02;
+      }
+
+      .priority-low {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+      }
+
+      .todo-text {
+        flex: 1;
+        font-size: 16px;
+        transition: all 0.3s;
+      }
+
+      .todo-text.completed {
+        text-decoration: line-through;
+        color: #666;
+      }
+
+      .delete-btn {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .delete-btn:hover {
+        background: #ff5252;
+      }
+
+      .stats {
+        padding: 20px 30px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: #999;
+      }
+
+      .empty-state h3 {
+        margin-bottom: 10px;
+      }
+
+      .todo-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .edit-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .edit-btn:hover {
+        background: #45a049;
+      }
+
+      .edit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .save-btn {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .save-btn:hover {
+        background: #1976d2;
+      }
+
+      .cancel-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .cancel-btn:hover {
+        background: #d32f2f;
+      }
+
+      .edit-input {
+        flex: 1;
+        padding: 8px;
+        border: 2px solid #2196f3;
+        border-radius: 5px;
+        font-size: 16px;
+        outline: none;
+        margin-right: 10px;
+      }
+      .filters {
+        padding: 20px 30px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-btn {
+        padding: 10px 20px;
+        border: 2px solid #2196f3;
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.3s;
+        color: #2196f3;
+      }
+
+      .filter-btn:hover {
+        background: #e3f2fd;
+      }
+
+      .filter-btn.active {
+        background: #2196f3;
+        color: white;
+      }
+      .clear-completed-btn {
+        padding: 10px 20px;
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: auto;
+        transition: all 0.3s;
+      }
+
+      .clear-completed-btn:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // Individual Todo Item Component
+      function TodoItem({ todo, onToggle, onDelete, onEdit }) {
+        const [isEditing, setIsEditing] = useState(false);
+        const [editText, setEditText] = useState(todo.text);
+
+        const getPriorityClass = (priority) => {
+          return `priority-badge priority-${priority}`;
+        };
+
+        const handleSave = () => {
+          console.log("Save clicked!");
+          console.log("editText:", editText);
+          console.log("todo.id:", todo.id);
+
+          if (editText.trim() !== "") {
+            console.log("Calling onEdit...");
+            onEdit(todo.id, editText.trim());
+            setIsEditing(false);
+          } else {
+            console.log("editText is empty!");
+          }
+        };
+
+        const handleCancel = () => {
+          setEditText(todo.text); // Reset to original text
+          setIsEditing(false);
+        };
+
+        return (
+          <div className={`todo-item ${todo.completed ? "completed" : ""}`}>
+            <input
+              type="checkbox"
+              className="todo-checkbox"
+              checked={todo.completed}
+              onChange={() => onToggle(todo.id)}
+            />
+            <span className={getPriorityClass(todo.priority)}>
+              {todo.priority.toUpperCase()}
+            </span>
+
+            {isEditing ? (
+              <input
+                type="text"
+                className="edit-input"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSave()}
+              />
+            ) : (
+              <span
+                className={`todo-text ${todo.completed ? "completed" : ""}`}
+              >
+                {todo.text}
+              </span>
+            )}
+
+            <div className="todo-actions">
+              {isEditing ? (
+                <>
+                  <button className="save-btn" onClick={handleSave}>
+                    Save
+                  </button>
+                  <button className="cancel-btn" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="edit-btn"
+                    onClick={() => setIsEditing(true)}
+                    disabled={todo.completed}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => onDelete(todo.id)}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // Main Todo App Component
+      function TodoApp() {
+        // State for todos list and input
+        const [todos, setTodos] = useState([]);
+        const [inputValue, setInputValue] = useState("");
+        const [selectedPriority, setSelectedPriority] = useState("medium");
+        const [filter, setFilter] = useState("all");
+
+        // Load todos from localStorage on component mount
+        useEffect(() => {
+          const savedTodos = localStorage.getItem("react-todos");
+          if (savedTodos) {
+            setTodos(JSON.parse(savedTodos));
+          }
+        }, []);
+
+        // Save todos to localStorage whenever todos change
+        useEffect(() => {
+          localStorage.setItem("react-todos", JSON.stringify(todos));
+        }, [todos]);
+
+        // Add new todo
+        const addTodo = () => {
+          if (inputValue.trim() !== "") {
+            const newTodo = {
+              id: Date.now(),
+              text: inputValue.trim(),
+              completed: false,
+              priority: selectedPriority,
+            };
+            setTodos([...todos, newTodo]);
+            setInputValue("");
+          }
+        };
+
+        // Toggle todo completion
+        const toggleTodo = (id) => {
+          setTodos(
+            todos.map((todo) =>
+              todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            )
+          );
+        };
+
+        // Delete todo
+        const deleteTodo = (id) => {
+          setTodos(todos.filter((todo) => todo.id !== id));
+        };
+
+        // Add this function after deleteTodo
+        const editTodo = (id, newText) => {
+          setTodos(
+            todos.map((todo) =>
+              todo.id === id ? { ...todo, text: newText } : todo
+            )
+          );
+        };
+        // Add this function after editTodo
+        const getFilteredTodos = () => {
+          if (filter === "active") {
+            return todos.filter((todo) => !todo.completed);
+          }
+          if (filter === "completed") {
+            return todos.filter((todo) => todo.completed);
+          }
+          return todos; // 'all' - return everything
+        };
+
+        const clearCompleted = () => {
+          setTodos(todos.filter((todo) => !todo.completed));
+        };
+
+        // Handle Enter key press
+        const handleKeyPress = (e) => {
+          if (e.key === "Enter") {
+            addTodo();
+          }
+        };
+
+        // Calculate stats
+        const totalTodos = todos.length;
+        const completedTodos = todos.filter((todo) => todo.completed).length;
+        const pendingTodos = totalTodos - completedTodos;
+
+        return (
+          <div className="container">
+            <div className="header">
+              <h1>🚀 My Learning Journey Tasks</h1>
+              <p>Learning React by building!</p>
+            </div>
+
+            <div className="add-todo">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="todo-input"
+                  placeholder="What needs to be done?"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+                <select
+                  className="priority-select"
+                  value={selectedPriority}
+                  onChange={(e) => setSelectedPriority(e.target.value)}
+                >
+                  <option value="low">Low Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="high">High Priority</option>
+                </select>
+                <button className="add-btn" onClick={addTodo}>
+                  Add Todo
+                </button>
+              </div>
+            </div>
+
+            <div className="filters">
+              <button
+                className={`filter-btn ${filter === "all" ? "active" : ""}`}
+                onClick={() => setFilter("all")}
+              >
+                All ({todos.length})
+              </button>
+              <button
+                className={`filter-btn ${filter === "active" ? "active" : ""}`}
+                onClick={() => setFilter("active")}
+              >
+                Active ({todos.filter((todo) => !todo.completed).length})
+              </button>
+              <button
+                className={`filter-btn ${
+                  filter === "completed" ? "active" : ""
+                }`}
+                onClick={() => setFilter("completed")}
+              >
+                Completed ({todos.filter((todo) => todo.completed).length})
+              </button>
+              {todos.filter((todo) => todo.completed).length > 0 && (
+                <button
+                  className="clear-completed-btn"
+                  onClick={clearCompleted}
+                >
+                  Clear Completed (
+                  {todos.filter((todo) => todo.completed).length})
+                </button>
+              )}
+            </div>
+
+            <div className="todo-list">
+              {todos.length === 0 ? (
+                <div className="empty-state">
+                  <h3>No todos yet!</h3>
+                  <p>Add your first todo above to get started.</p>
+                </div>
+              ) : (
+                getFilteredTodos().map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    onToggle={toggleTodo}
+                    onDelete={deleteTodo}
+                    onEdit={editTodo}
+                  />
+                ))
+              )}
+            </div>
+
+            {todos.length > 0 && (
+              <div className="stats">
+                <span>Total: {totalTodos}</span>
+                <span>Pending: {pendingTodos}</span>
+                <span>Completed: {completedTodos}</span>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // Render the app
+      ReactDOM.render(<TodoApp />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
