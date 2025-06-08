@@ -27,7 +27,7 @@ This project helped me learn:
 - CSS styling and responsive design
 
 ## 🚀 Live Demo
-[View Live App](https://your-username.github.io/my-react-todo-app/)
+[View Live App]([https://your-username.github.io/my-react-todo-app/](https://fieck-san.github.io/fieck-todos/))
 
 ## 💻 How to Run Locally
 1. Download the `index.html` file
